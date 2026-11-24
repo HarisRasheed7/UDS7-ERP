@@ -1,0 +1,49 @@
+# PHASE 0 — DOCUMENTATION AND REPOSITORY AUDIT ONLY
+
+You are working on a professional Multi-Organization, Multi-Industry ERP & Business Management Platform.
+
+Read and follow these documents before doing anything else:
+
+1. `00-MASTER-INSTRUCTIONS.md`
+2. `IMPLEMENTATION-MASTER-INSTRUCTIONS.md`
+3. `DOCUMENTATION-AUDIT.md`
+4. `IMPLEMENTATION-ROADMAP.md`
+5. `PHASES.md`
+5. The remaining project specifications, development rules, module and industry specifications, and PRD PDF/Markdown files.
+
+## Your task
+
+Execute **Phase 0 only** from `IMPLEMENTATION-ROADMAP.md`.
+
+First, inspect the actual repository and inventory its files. Then audit the documentation, identify conflicts and missing files, compare the original and enhanced master instructions, and compare the PRD PDF with its Markdown version.
+
+Produce the audit deliverables required by `DOCUMENTATION-AUDIT.md`, including:
+
+- Repository inventory
+- Canonical-document recommendation
+- PRD comparison report
+- Missing, duplicated, stale, or misreferenced documentation report
+- Requirements traceability matrix
+- Conflict and open-decision register
+- Module dependency graph
+- Technical risk register
+- Proposed first vertical slice and its acceptance tests
+- Phase 1 readiness recommendation
+
+For each finding, reference the actual file path and relevant heading or section. Clearly distinguish verified facts from assumptions and recommendations.
+
+## Strict restrictions
+
+- Do not implement business modules.
+- Do not scaffold, overwrite, or restructure an existing application.
+- Do not delete, rename, or merge documentation files.
+- Do not silently choose between conflicting master instructions.
+- Do not invent a project name; it remains undecided.
+- Preserve the JavaScript-only requirement, the prohibition on TypeScript and Tailwind CSS, and the specified technology constraints.
+- Do not claim a check or test passed unless you actually ran it.
+- Also make test files of things all modules all the phases which u will do okay so that we can see that are we going according to steps we can create all of those files in a seprate folder so that we will not confuse that what has done and what need to be do next ?
+- Do not begin Phase 1 automatically.
+
+You may create a separate audit report and supporting analysis artifacts if necessary, but do not modify the original specifications without approval.
+
+When finished, stop and present the findings, unresolved decisions, risks, and recommended next steps. Wait for my approval before proceeding to Phase 1.
