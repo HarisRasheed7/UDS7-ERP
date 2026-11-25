@@ -12,9 +12,9 @@
 |---|---|---|---|---|---|
 | **Phase 00** | **Documentation & Repository Audit** | **CLOSED** | `audit/verification/test_phase_0.js` | 2026-11-24 | Verified & Approved |
 | **Phase 01** | **Requirements Decomposition & Acceptance Mapping** | **CLOSED** | `audit/verification/test_phase_1.js` | 2026-11-24 | Verified & Approved |
-| **Phase 02** | **Architecture & ADR Approval** | **VERIFIED** | `audit/verification/test_phase_2.js` | 2026-11-25 | Ready for Approval |
-| **Phase 03** | **Repository & Local Dev Environment Setup** | *PLANNED (Next)* | `audit/verification/test_phase_3.js` | — | — |
-| **Phase 04** | **CI/CD & Quality Gates** | *PLANNED* | `audit/verification/test_phase_4.js` | — | — |
+| **Phase 02** | **Architecture & ADR Approval** | **CLOSED** | `audit/verification/test_phase_2.js` | 2026-11-25 | Verified & Approved |
+| **Phase 03** | **Repository & Local Dev Environment Setup** | **VERIFIED** | `audit/verification/test_phase_3.js` | 2026-11-25 | Ready for Approval |
+| **Phase 04** | **CI/CD & Quality Gates** | *PLANNED (Next)* | `audit/verification/test_phase_4.js` | — | — |
 | **Phase 05** | **PostgreSQL & Migration Foundation** | *PLANNED* | `audit/verification/test_phase_5.js` | — | — |
 | **Phase 06** | **API Foundation & Contract Discipline** | *PLANNED* | `audit/verification/test_phase_6.js` | — | — |
 | **Phase 07** | **Authentication & Account Lifecycle** | *PLANNED* | `audit/verification/test_phase_7.js` | — | — |
@@ -76,9 +76,20 @@
 
 ---
 
-## 5. What Needs to Be Done Next (Entering Phase 03: Repository & Local Dev Environment Setup)
+## 5. Phase 03 Detailed Verification Checklist (Complete & Verified)
 
-1. Confirm ADR sign-offs (`ADR-001`, `ADR-003` Fastify, `ADR-004` `pg` + SQL migrations, `ADR-005` Shared DB + RLS, `ADR-008` Staged Redis/BullMQ, `ADR-010` Vitest + Playwright).
-2. Scaffold the canonical folder structure (`client/`, `server/`, `shared/`, `database/`, `tests/`, `scripts/`, `config/`) without violating existing docs.
-3. Configure root and workspace `package.json`, ESLint, Prettier, JavaScript-only & no-Tailwind static policy checks, and `.env.example` / `README.md` setup guides.
-4. Generate and pass `audit/verification/test_phase_3.js`.
+* [x] **Canonical Monorepo Workspaces:** Root `package.json` configured with npm workspaces `@platform/client`, `@platform/server`, and `@platform/shared`.
+* [x] **Frontend Baseline (`client/`):** Next.js 15 App Router configured in pure JavaScript (`.jsx`/`.js`) with CSS custom property design tokens (`tokens.css`) and CSS Modules (zero Tailwind CSS, zero TypeScript).
+* [x] **Backend Baseline (`server/`):** Fastify v5 server configured with `X-Request-ID`/`X-Correlation-ID` propagation, sanitized error envelope, and `/api/v1/health/live` & `/api/v1/health/ready` endpoints.
+* [x] **Environment & Secret Hygiene:** `.env.example` created with safe non-secret defaults; Zod validation (`shared/schemas/envSchema.js`) enforces strong secrets in staging/production; `.gitignore` blocks `.env*` and `storage/`.
+* [x] **Quality & Policy Gates:** ESLint 9, Prettier, Vitest unit/API tests (`7/7` passed), `verify-policy.js`, and Next.js production build (`next build`) verified.
+* [x] **Automated Phase Suite Execution:** Executed `audit/verification/test_phase_3.js` with 100% passing assertions (59/59).
+
+---
+
+## 6. What Needs to Be Done Next (Entering Phase 04: CI/CD & Quality Gates)
+
+1. Configure automated GitHub Actions CI workflows (`.github/workflows/ci.yml`) running `policy:check`, `lint`, `format:check`, `test`, `test:phases`, and `build`.
+2. Add pull-request / branch quality gate policies and dependency security checks (`npm audit` / static boundary checks).
+3. Verify an intentional failing check blocks CI while a clean baseline passes.
+4. Generate and pass `audit/verification/test_phase_4.js`.
