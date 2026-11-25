@@ -1,0 +1,12 @@
+node_modules/
+.next/
+dist/
+build/
+coverage/
+storage/
+docs/
+audit/
+00-MASTER-INSTRUCTIONS.md
+IMPLEMENTATION-ROADMAP-STAGES.md
+README.md
+package-lock.json
