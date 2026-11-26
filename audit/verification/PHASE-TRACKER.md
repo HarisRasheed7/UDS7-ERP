@@ -13,9 +13,9 @@
 | **Phase 00** | **Documentation & Repository Audit** | **CLOSED** | `audit/verification/test_phase_0.js` | 2026-11-24 | Verified & Approved |
 | **Phase 01** | **Requirements Decomposition & Acceptance Mapping** | **CLOSED** | `audit/verification/test_phase_1.js` | 2026-11-24 | Verified & Approved |
 | **Phase 02** | **Architecture & ADR Approval** | **CLOSED** | `audit/verification/test_phase_2.js` | 2026-11-25 | Verified & Approved |
-| **Phase 03** | **Repository & Local Dev Environment Setup** | **VERIFIED** | `audit/verification/test_phase_3.js` | 2026-11-25 | Ready for Approval |
-| **Phase 04** | **CI/CD & Quality Gates** | *PLANNED (Next)* | `audit/verification/test_phase_4.js` | — | — |
-| **Phase 05** | **PostgreSQL & Migration Foundation** | *PLANNED* | `audit/verification/test_phase_5.js` | — | — |
+| **Phase 03** | **Repository & Local Dev Environment Setup** | **CLOSED** | `audit/verification/test_phase_3.js` | 2026-11-25 | Verified & Approved |
+| **Phase 04** | **CI/CD & Quality Gates** | **VERIFIED** | `audit/verification/test_phase_4.js` | 2026-11-26 | Ready for Approval |
+| **Phase 05** | **PostgreSQL & Migration Foundation** | *PLANNED (Next)* | `audit/verification/test_phase_5.js` | — | — |
 | **Phase 06** | **API Foundation & Contract Discipline** | *PLANNED* | `audit/verification/test_phase_6.js` | — | — |
 | **Phase 07** | **Authentication & Account Lifecycle** | *PLANNED* | `audit/verification/test_phase_7.js` | — | — |
 | **Phase 08** | **Organization Hierarchy & Tenant Context** | *PLANNED* | `audit/verification/test_phase_8.js` | — | — |
@@ -87,9 +87,21 @@
 
 ---
 
-## 6. What Needs to Be Done Next (Entering Phase 04: CI/CD & Quality Gates)
+## 6. Phase 04 Detailed Verification Checklist (Complete & Verified)
 
-1. Configure automated GitHub Actions CI workflows (`.github/workflows/ci.yml`) running `policy:check`, `lint`, `format:check`, `test`, `test:phases`, and `build`.
-2. Add pull-request / branch quality gate policies and dependency security checks (`npm audit` / static boundary checks).
-3. Verify an intentional failing check blocks CI while a clean baseline passes.
-4. Generate and pass `audit/verification/test_phase_4.js`.
+* [x] **GitHub Actions CI Pipeline:** Configured two-stage workflow in `.github/workflows/ci.yml` (`fast-gates` + `full-verification`) with least-privilege permissions and 14-day artifact retention for `reports/`.
+* [x] **Fast Feedback vs Full Verification Suites:** Added `npm run verify:fast` and `npm run verify:full` in `package.json` and `scripts/testing/`.
+* [x] **Static Policy & Boundary Enforcement:** Strengthened `scripts/testing/verify-policy.js` to block `.ts`/`.tsx`, Tailwind configs/directives, cross-module internal repository imports, client-to-server/DB imports, and committed secrets.
+* [x] **Migration Integrity Gate:** Created `scripts/testing/check-migrations.js` enforcing sequential `NNNN_*.sql` ordering and blocking floating-point money/quantity columns.
+* [x] **Dependency Vulnerability Gate:** Upgraded `next` (`16.4.6`), `vitest` (`5.1.2`), and `zod` (`4.6.7`) and verified `npm run audit:deps` (`npm audit --audit-level=high`).
+* [x] **Governance & Templates:** Added `.github/pull_request_template.md`, `.github/ISSUE_TEMPLATE/*`, `.github/CODEOWNERS`, and `config/ci/quality-gate-policy.md`.
+* [x] **Intentional Failure Proof & Automated Verification:** Proven via `tests/unit/scripts/qualityGates.test.js` and `audit/verification/test_phase_4.js` that intentional policy/migration errors block the pipeline.
+
+---
+
+## 7. What Needs to Be Done Next (Entering Phase 05: PostgreSQL & Migration Foundation)
+
+1. Verify/install PostgreSQL (>= 15) locally or via Docker Compose (`DATABASE_URL` configured in `.env`).
+2. Implement `node-postgres` (`pg`) connection pooling, Transaction/Unit-of-Work helper (`withTransaction`, `withTenantTransaction`), and versioned SQL migration runner under `database/`.
+3. Execute `SPIKE-01` (connection-pooled PostgreSQL RLS isolation) and `SPIKE-02` (immutability triggers + `NUMERIC(20, 4)` + `decimal.js` precision).
+4. Generate and pass `audit/verification/test_phase_5.js`.
