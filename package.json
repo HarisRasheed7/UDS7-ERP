@@ -21,8 +21,12 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "policy:check": "node scripts/testing/verify-policy.js",
+    "migrations:check": "node scripts/testing/check-migrations.js",
+    "audit:deps": "npm audit --audit-level=high",
     "test": "vitest run",
     "test:phases": "node scripts/testing/run-phase-checks.js",
+    "verify:fast": "node scripts/testing/run-fast-checks.js",
+    "verify:full": "node scripts/testing/run-full-checks.js",
     "validate": "node scripts/testing/run-validate.js"
   },
   "devDependencies": {
@@ -33,6 +37,6 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "globals": "^16.0.0",
     "prettier": "^3.5.3",
-    "vitest": "^3.0.9"
+    "vitest": "^5.1.2"
   }
 }
