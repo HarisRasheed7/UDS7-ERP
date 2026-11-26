@@ -68,10 +68,16 @@ cp .env.example .env
 | `npm run build` | Builds the Next.js production bundle |
 | `npm run lint` | Runs ESLint across all JavaScript & JSX code |
 | `npm run format:check` | Verifies Prettier code formatting |
-| `npm run policy:check` | Enforces JS-only, No-Tailwind, and secret hygiene rules |
+| `npm run policy:check` | Enforces JS-only, No-Tailwind, module boundaries & secret hygiene |
+| `npm run migrations:check` | Validates SQL migration order & blocks floating-point money columns |
+| `npm run audit:deps` | Audits workspace dependencies for high/critical vulnerabilities |
 | `npm test` | Runs Vitest unit & API integration tests |
 | `npm run test:phases` | Runs sequential phase verification suites (`audit/verification/`) |
-| `npm run validate` | Runs all gates: `policy:check`, `lint`, `format:check`, `test`, `test:phases` |
+| `npm run verify:fast` | Fast CI feedback gate (policy, migrations, lint, format, unit tests) |
+| `npm run verify:full` | Full CI gate (fast gates + full tests + phase suites + `next build` + reports) |
+| `npm run validate` | Runs policy, migrations, lint, format, test, and phase verification suites |
+
+See [config/ci/quality-gate-policy.md](config/ci/quality-gate-policy.md) and [.github/workflows/ci.yml](.github/workflows/ci.yml) for automated CI enforcement details.
 
 ### 5. Health Verification
 When `npm run dev:server` is running:

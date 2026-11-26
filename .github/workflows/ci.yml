@@ -1,0 +1,70 @@
+name: CI Quality Gates
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fast-gates:
+    name: Fast Feedback & Policy Gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Clean install dependencies
+        run: npm ci
+
+      - name: Run fast verification gates (policy, migrations, lint, format, unit tests)
+        run: npm run verify:fast
+
+  full-verification:
+    name: Full Verification, Build & Dependency Security
+    needs: fast-gates
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Clean install dependencies
+        run: npm ci
+
+      - name: Run full verification suite (tests, phase gates, production build)
+        run: npm run verify:full
+
+      - name: Dependency vulnerability check (high/critical)
+        run: npm run audit:deps
+
+      - name: Retain CI test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-test-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 14
+          if-no-files-found: warn
