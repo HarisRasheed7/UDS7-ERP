@@ -8,6 +8,7 @@ const isWindows = process.platform === 'win32';
 
 const steps = [
   { label: 'Policy Check', args: ['run', 'policy:check'] },
+  { label: 'Migration Integrity Check', args: ['run', 'migrations:check'] },
   { label: 'ESLint Check', args: ['run', 'lint'] },
   { label: 'Prettier Check', args: ['run', 'format:check'] },
   { label: 'Vitest Suite', args: ['run', 'test'] },
