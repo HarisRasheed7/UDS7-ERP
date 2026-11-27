@@ -4,6 +4,7 @@
   "private": true,
   "main": "./index.js",
   "dependencies": {
+    "decimal.js": "^10.5.0",
     "zod": "^4.6.7"
   }
 }

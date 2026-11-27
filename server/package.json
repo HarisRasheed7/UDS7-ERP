@@ -12,6 +12,7 @@
     "@fastify/helmet": "^13.0.1",
     "@platform/shared": "*",
     "dotenv": "^16.4.7",
-    "fastify": "^5.2.2"
+    "fastify": "^5.2.2",
+    "pg": "^8.14.1"
   }
 }
