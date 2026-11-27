@@ -14,9 +14,9 @@
 | **Phase 01** | **Requirements Decomposition & Acceptance Mapping** | **CLOSED** | `audit/verification/test_phase_1.js` | 2026-11-24 | Verified & Approved |
 | **Phase 02** | **Architecture & ADR Approval** | **CLOSED** | `audit/verification/test_phase_2.js` | 2026-11-25 | Verified & Approved |
 | **Phase 03** | **Repository & Local Dev Environment Setup** | **CLOSED** | `audit/verification/test_phase_3.js` | 2026-11-25 | Verified & Approved |
-| **Phase 04** | **CI/CD & Quality Gates** | **VERIFIED** | `audit/verification/test_phase_4.js` | 2026-11-26 | Ready for Approval |
-| **Phase 05** | **PostgreSQL & Migration Foundation** | *PLANNED (Next)* | `audit/verification/test_phase_5.js` | — | — |
-| **Phase 06** | **API Foundation & Contract Discipline** | *PLANNED* | `audit/verification/test_phase_6.js` | — | — |
+| **Phase 04** | **CI/CD & Quality Gates** | **CLOSED** | `audit/verification/test_phase_4.js` | 2026-11-26 | Verified & Approved |
+| **Phase 05** | **PostgreSQL & Migration Foundation** | **VERIFIED** | `audit/verification/test_phase_5.js` | 2026-11-27 | Ready for Approval |
+| **Phase 06** | **API Foundation & Contract Discipline** | *PLANNED (Next)* | `audit/verification/test_phase_6.js` | — | — |
 | **Phase 07** | **Authentication & Account Lifecycle** | *PLANNED* | `audit/verification/test_phase_7.js` | — | — |
 | **Phase 08** | **Organization Hierarchy & Tenant Context** | *PLANNED* | `audit/verification/test_phase_8.js` | — | — |
 | **Phase 09** | **Authorization, Roles & Permission Evaluation** | *PLANNED* | `audit/verification/test_phase_9.js` | — | — |
@@ -99,9 +99,24 @@
 
 ---
 
-## 7. What Needs to Be Done Next (Entering Phase 05: PostgreSQL & Migration Foundation)
+## 7. Phase 05 Detailed Verification Checklist
 
-1. Verify/install PostgreSQL (>= 15) locally or via Docker Compose (`DATABASE_URL` configured in `.env`).
-2. Implement `node-postgres` (`pg`) connection pooling, Transaction/Unit-of-Work helper (`withTransaction`, `withTenantTransaction`), and versioned SQL migration runner under `database/`.
-3. Execute `SPIKE-01` (connection-pooled PostgreSQL RLS isolation) and `SPIKE-02` (immutability triggers + `NUMERIC(20, 4)` + `decimal.js` precision).
-4. Generate and pass `audit/verification/test_phase_5.js`.
+| Requirement | Deliverable / Evidence | Status |
+| :--- | :--- | :--- |
+| PostgreSQL 19.0 local server & DB bootstrap | `scripts/database/bootstrap.js`, `erp_platform_dev` & `erp_platform_test` | Verified |
+| Runtime pooling & health integration | `server/src/database/pool.js`, `server/src/server.js`, `shared/schemas/envSchema.js` | Verified |
+| Tenant RLS & transaction helpers | `server/src/database/transaction.js` (`withTransaction`, `withTenantTransaction`, `executeWithDeadlockRetry`) | Verified |
+| Checksummed SQL migration runner & CLI | `database/migrator.js`, `scripts/database/migrate.js`, `package.json` (`db:*` scripts) | Verified |
+| Foundation SQL schemas & non-superuser RLS role | `database/migrations/0001_init_extensions_and_functions.sql`, `0002_init_foundation_core.sql` (+ `.down.sql`) | Verified |
+| Arbitrary-precision money arithmetic | `shared/utils/money.js` (`decimal.js` precision 38 / scale 4 + `verifyDoubleEntryBalance`) | Verified |
+| `SPIKE-01` & `SPIKE-02` + live DB integration suite | `tests/integration/database/foundation.test.js`, `tests/unit/shared/money.test.js` | Verified |
+| CI PostgreSQL service & Phase 05 gate | `.github/workflows/ci.yml`, `audit/verification/test_phase_5.js` | Verified |
+
+---
+
+## 8. What Needs to Be Done Next (Entering Phase 06: API Foundation & Contract Discipline)
+
+1. Implement REST API conventions (`/api/v1/*`), versioned health/readiness endpoints, standard response envelope, and RFC 9457 / unified error handling.
+2. Add centralized `zod` request validation middleware, cursor/offset pagination utilities, correlation/request ID propagation, and rate-limiting baseline.
+3. Enforce PII/secret-safe logging redaction and open-API / endpoint contract tests across `server` and `shared`.
+4. Generate and pass `audit/verification/test_phase_6.js`.

@@ -131,10 +131,15 @@ assert(
   gitignore.includes('.env') && gitignore.includes('storage/'),
   '.gitignore excludes .env and local storage/'
 );
-assert(
-  !fs.existsSync(path.join(repoRoot, '.env')),
-  'No live .env secrets file committed or created unexpectedly'
-);
+const { execFileSync } = require('child_process');
+const trackedEnv = execFileSync('git', ['ls-files', '--', '.env', '.env.*'], {
+  cwd: repoRoot,
+  encoding: 'utf8'
+})
+  .split(/\r?\n/)
+  .map((s) => s.trim())
+  .filter((s) => s && s !== '.env.example');
+assert(trackedEnv.length === 0, 'No live .env secrets file is tracked in Git');
 
 const envExample = fs.readFileSync(path.join(repoRoot, '.env.example'), 'utf8');
 assert(

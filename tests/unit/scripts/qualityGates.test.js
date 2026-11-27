@@ -40,6 +40,15 @@ describe('CI quality gates: intentional failure blocking', () => {
     expect(checkMigrations(dir).passed).toBe(true);
   });
 
+  it('blocks an unignored .env file while allowing a properly gitignored local .env', () => {
+    const dir = makeTempWorkspace();
+    fs.writeFileSync(path.join(dir, '.env'), 'SESSION_SECRET=local_dev_only\n');
+    expect(verifyPolicy(dir).passed).toBe(false);
+
+    fs.writeFileSync(path.join(dir, '.gitignore'), '.env\n*.env\n');
+    expect(verifyPolicy(dir).passed).toBe(true);
+  });
+
   it('blocks an intentional TypeScript file violation', () => {
     const dir = makeTempWorkspace();
     fs.writeFileSync(
