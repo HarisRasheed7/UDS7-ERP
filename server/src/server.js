@@ -1,11 +1,25 @@
 'use strict';
 
 const { loadServerConfig } = require('./config/environment');
+const { createDbPool, checkDatabaseHealth, closeDbPool } = require('./database');
 const { createServerApp } = require('./app');
 
 async function startServer() {
   const config = loadServerConfig();
-  const app = createServerApp({ config });
+
+  let dbPool = null;
+  if (config.DATABASE_URL && !config.DATABASE_URL.includes('CHANGE_ME')) {
+    dbPool = createDbPool(config);
+  }
+
+  const app = createServerApp({
+    config,
+    checkDatabase: dbPool ? () => checkDatabaseHealth(dbPool) : undefined
+  });
+
+  app.addHook('onClose', async () => {
+    await closeDbPool(dbPool);
+  });
 
   try {
     await app.listen({
@@ -14,6 +28,7 @@ async function startServer() {
     });
   } catch (error) {
     app.log.error(error, 'Failed to start ERP platform server');
+    await closeDbPool(dbPool);
     process.exit(1);
   }
 }
