@@ -40,13 +40,18 @@ UDS7 ERP is a comprehensive, scalable, and modular enterprise resource planning 
 ### 1. Prerequisites
 * **Node.js** `>= 20.0.0` (verified on `v26.13.1`)
 * **npm** `>= 10.0.0` (verified on `11.20.0`)
-* **PostgreSQL** `>= 15` *(required starting in Phase 05; optional during Phases 03–04)*
+* **PostgreSQL** `>= 15` (verified on `PostgreSQL 19.0`)
 
-### 2. Clean Checkout Installation
+### 2. Clean Checkout Installation & Database Bootstrap
 ```bash
 git clone https://github.com/HarisRasheed7/UDS7-ERP.git
 cd UDS7-ERP
 npm install
+cp .env.example .env
+# Edit .env locally with your PostgreSQL password for DATABASE_URL & TEST_DATABASE_URL
+npm run db:bootstrap
+npm run db:migrate
+npm run db:migrate:test
 ```
 
 > **Windows PowerShell Note:** If PowerShell blocks `npm` script execution (`npm.ps1 cannot be loaded`), run `npm.cmd install` and `npm.cmd run <script>` or execute commands via Git Bash / Command Prompt.

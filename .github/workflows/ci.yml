@@ -37,10 +37,27 @@ jobs:
         run: npm run verify:fast
 
   full-verification:
-    name: Full Verification, Build & Dependency Security
+    name: Full Verification, PostgreSQL Integration, Build & Security
     needs: fast-gates
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ci_test_password
+          POSTGRES_DB: erp_platform_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://postgres:ci_test_password@127.0.0.1:5432/erp_platform_dev
+      TEST_DATABASE_URL: postgresql://postgres:ci_test_password@127.0.0.1:5432/erp_platform_test
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -54,7 +71,13 @@ jobs:
       - name: Clean install dependencies
         run: npm ci
 
-      - name: Run full verification suite (tests, phase gates, production build)
+      - name: Bootstrap & migrate dev and test PostgreSQL databases
+        run: |
+          npm run db:bootstrap
+          npm run db:migrate
+          npm run db:migrate:test
+
+      - name: Run full verification suite (unit, API, DB integration, phase gates, production build)
         run: npm run verify:full
 
       - name: Dependency vulnerability check (high/critical)

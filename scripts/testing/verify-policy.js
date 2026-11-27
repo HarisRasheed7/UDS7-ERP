@@ -98,14 +98,42 @@ function verifyPolicy(targetRoot) {
         }
       }
 
-      // 6. Disallow committed real .env files (only .env.example permitted)
+      // 6. Disallow unignored or tracked .env files (only .env.example permitted in VCS)
       if (
         entry.name === '.env' ||
         (entry.name.startsWith('.env.') && entry.name !== '.env.example')
       ) {
-        violations.push(
-          `[SECRET VIOLATION] Environment secret file present in workspace: ${relPath}`
+        const gitignorePath = path.join(repoRoot, '.gitignore');
+        const gitignoreText = fs.existsSync(gitignorePath)
+          ? fs.readFileSync(gitignorePath, 'utf8')
+          : '';
+        const isIgnoredByRule = /(?:^|\r?\n)\s*(?:\*\.env|\.env(?:\.\*)?)\s*(?:\r?\n|$)/.test(
+          gitignoreText
         );
+
+        let isTrackedInGit = false;
+        if (fs.existsSync(path.join(repoRoot, '.git'))) {
+          const { execFileSync } = require('child_process');
+          try {
+            const tracked = execFileSync('git', ['ls-files', '--', relPath], {
+              cwd: repoRoot,
+              encoding: 'utf8'
+            }).trim();
+            const staged = execFileSync('git', ['diff', '--cached', '--name-only', '--', relPath], {
+              cwd: repoRoot,
+              encoding: 'utf8'
+            }).trim();
+            isTrackedInGit = tracked.length > 0 || staged.length > 0;
+          } catch {
+            isTrackedInGit = false;
+          }
+        }
+
+        if (isTrackedInGit || !isIgnoredByRule) {
+          violations.push(
+            `[SECRET VIOLATION] Unignored or tracked environment file detected: ${relPath}`
+          );
+        }
       }
 
       // 7. Module boundary & client isolation checks in JS/JSX source
