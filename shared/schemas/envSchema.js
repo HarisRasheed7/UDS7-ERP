@@ -16,6 +16,13 @@ const serverEnvSchema = z
       .default('info'),
     CORS_ALLOWED_ORIGINS: z.string().default('http://127.0.0.1:3000,http://localhost:3000'),
     DATABASE_URL: z.string().optional(),
+    TEST_DATABASE_URL: z.string().optional(),
+    DATABASE_APP_URL: z.string().optional(),
+    TEST_DATABASE_APP_URL: z.string().optional(),
+    DB_POOL_MAX: z.coerce.number().int().min(1).max(200).default(20),
+    DB_IDLE_TIMEOUT_MS: z.coerce.number().int().min(1000).max(300000).default(30000),
+    DB_CONNECTION_TIMEOUT_MS: z.coerce.number().int().min(500).max(60000).default(5000),
+    DB_STATEMENT_TIMEOUT_MS: z.coerce.number().int().min(500).max(120000).default(15000),
     SESSION_SECRET: z
       .string()
       .min(16, 'SESSION_SECRET must be at least 16 characters')
@@ -28,14 +35,14 @@ const serverEnvSchema = z
     if (isStrictEnv) {
       if (!env.DATABASE_URL || env.DATABASE_URL.includes('CHANGE_ME')) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['DATABASE_URL'],
           message: 'DATABASE_URL must be configured with real credentials in staging/production.'
         });
       }
       if (env.SESSION_SECRET.includes('dev-only') || env.SESSION_SECRET.length < 32) {
         ctx.addIssue({
-          code: z.ZodIssueCode.custom,
+          code: 'custom',
           path: ['SESSION_SECRET'],
           message: 'SESSION_SECRET must be >= 32 non-default characters in staging/production.'
         });
@@ -88,9 +95,30 @@ function parseClientEnv(rawEnv) {
   return Object.freeze(result.data);
 }
 
+/**
+ * Selects the appropriate database URL for the active NODE_ENV.
+ * @param {object} config
+ * @param {{ preferAppRole?: boolean }} [options]
+ * @returns {string | undefined}
+ */
+function resolveDatabaseUrl(config, options = {}) {
+  const { preferAppRole = false } = options;
+  if (config.NODE_ENV === 'test') {
+    if (preferAppRole && config.TEST_DATABASE_APP_URL) {
+      return config.TEST_DATABASE_APP_URL;
+    }
+    return config.TEST_DATABASE_URL;
+  }
+  if (preferAppRole && config.DATABASE_APP_URL && !config.DATABASE_APP_URL.includes('CHANGE_ME')) {
+    return config.DATABASE_APP_URL;
+  }
+  return config.DATABASE_URL;
+}
+
 module.exports = {
   serverEnvSchema,
   clientEnvSchema,
   parseServerEnv,
-  parseClientEnv
+  parseClientEnv,
+  resolveDatabaseUrl
 };
